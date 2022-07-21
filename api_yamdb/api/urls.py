@@ -1,11 +1,12 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from .views import CustomAuthToken, registration
+
 from .views import (CategoryViewSet, CommentViewSet,  # isort:skip
                     GenreViewSet,  # isort:skip
                     ReviewViewSet, TitleViewSet)  # isort:skip
 from users.views import UserViewSet  # isort:skip
-from .views import registration, CustomAuthToken
 
 router = routers.DefaultRouter()
 router.register('categories', CategoryViewSet)
