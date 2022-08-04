@@ -6,6 +6,47 @@
 
 ## Как запустить проект:
 
+В проекте настроен workflow, - автоматически запускается и разворачивается на сервре с помощь команды git push. Убедитесь, что на вашем сервере установлен Docker.
+
+Проект подразумевает использование dotenv, поэтому необходимо:
+
+**создать файл '.env' в дериктории '/infra/'**
+
+**Открыть его и наполнить в соответствии с примером ниже**
+
+```
+DB_ENGINE='django.db.backends.postgresql'
+DB_NAME='postgres'
+POSTGRES_USER='postgres'
+POSTGRES_PASSWORD='postgres'
+DB_HOST='db' 
+DB_PORT='...' 
+SECRET_KEY = '...'
+```
+
+**Запустить docker-compose**
+
+1. Создать контейнеры:
+$ docker-compose up -d --build
+
+2. Выполнить миграции:
+$ docker-compose exec web python manage.py makemigrations
+$ docker-compose exec web python manage.py migrate
+
+3. Создать скперпользвателя:
+$ docker-compose exec web python manage.py createsuperuser
+
+4. Сделать статику:
+$ docker-compose exec web python manage.py collectstatic --no-input
+
+
+**Основные URLs:**
+- http://84.201.153.187/api/v1/ - главная страница
+- http://84.201.153.187/admin - доступ к админке
+- http://84.201.153.187/redoc - доступ к reoc с подробным описанем проекта и его API
+
+## Как запустить проект (локально):
+
 **Клонировать репозиторий и перейти в него в командной строке:**
 
 cd api_yamdb
@@ -22,8 +63,14 @@ source venv/bin/activate (Linux)
 
 **Установить зависимости из файла requirements.txt:**
 
-python3 -m pip install --upgrade pip  
-pip install -r requirements.txt
+1) python -m pip install --upgrade pip (Windows)
+   python3 -m pip install --upgrade pip (Linux)
+   
+2) cd api_yambd
+   pip install -r requirements.txt
+
+**Заменить везде ИП**
+Так как проект рассчитан для выгрузки на сервер, то везде прописан ужаленный ИП (84.201.153.187), для работу локально его нужно заменить на 120.0.0.1
 
 **Запустить docker-compose**
 
@@ -39,7 +86,7 @@ pip install -r requirements.txt
 4. Соделать статику:
    docker-compose exec web python manage.py collectstatic --no-input
 
-## API для проекта YaMDb
+**API для проекта YaMDb**
 
 Просле запуска проекта, по адресу http://127.0.0.1/redoc/ будет доступна документация для API YaMDb. Там есть и примеры запросов к API.
 
@@ -47,6 +94,7 @@ pip install -r requirements.txt
 
 docker-compose exec web python manage.py dumpdata > fixtures.json
 
+Просле запуска проекта, по адресу http://127.0.0.1:8000/redoc/ будет доступна документация для API YaMDb. Там есть и примеры запросов к API.
 ## MIT License
 
 Copyright (c) [2022] [Yakushkin Vyacheslav]
@@ -68,43 +116,3 @@ Copyright (c) [2022] [Yakushkin Vyacheslav]
 ОТВЕТСТВЕННОСТЬ, БУДУЩАЯ ПО ​​ДОГОВОРУ, ДЕЛИКТУ ИЛИ ИНЫМ ОБРАЗОМ, ВОЗНИКАЮЩАЯ ИЗ,
 ВНЕ ИЛИ В СВЯЗИ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ ИЛИ ИСПОЛЬЗОВАНИЕМ ИЛИ ДРУГИМИ СДЕЛКАМИ В
 ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ.
-
-## API для проекта YaMDb
-
-Просле запуска проекта, по адресу http://127.0.0.1:8000/redoc/ будет доступна документация для API YaMDb. Там есть и примеры запросов к API.
-
-## импорт данных из CSV-фалов в БД
-
-### Windows
-
-**Скачать программу sqlite3**
-
-https://www.sqlite.org/download.htm
-
-**Создать <file_sh>**
-
-#!/bin/bash
-
-echo -e ".separator \",\"\n.mode csv\n.import --skip 1 <file_csv> <db_table_name>" | ./sqlite3.exe db.sqlite3
-
-**Запустить <file_sh>**
-
-chmod a+x ./<file_sh> (при импорте первой таблицы)
-./<file_sh> (последующие запуски импортов таблиц)
-
-### Linux
-
-**Установить программу sqlite3**
-
-pip install pysqlite3
-
-**Cоздать <file_sh>**
-
-#!/bin/bash
-
-echo -e ".separator \",\"\n.mode csv\n.import --skip 1 <file_csv> <db_table_name>" | ./sqlite3 db.sqlite3
-
-**Запустить <file_sh>**
-
-chmod a+x ./<file_sh> (при импорте первой таблицы)
-./<file_sh> (последующие запуски импортов таблиц)
